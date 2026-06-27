@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ColdEmailer — Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="cover">
+    <div class="brand" style="padding-left:0">
+      <div class="brand-mark">C</div>
+      <div class="brand-name">ColdEmailer</div>
+    </div>
+
+    <h1 class="page-title" style="font-size: var(--text-3xl); margin-top: var(--s-6)">Frontend Design</h1>
+    <p class="page-sub" style="max-width: 640px; font-size: var(--text-lg)">
+      A classic, professional UI for the Gmail-native cold-outreach app — Linear/Stripe visual language.
+      Every screen maps to a real backend capability. Open each file in a browser, or import into Figma
+      with the <span class="tag-mono">html.to.design</span> plugin.
+    </p>
+
+    <div class="row" style="gap: var(--s-2); margin-top: var(--s-5); flex-wrap: wrap">
+      <span class="badge badge-active"><span class="dot"></span>ACTIVE</span>
+      <span class="badge badge-paused"><span class="dot"></span>PAUSED</span>
+      <span class="badge badge-completed"><span class="dot"></span>COMPLETED</span>
+      <span class="badge badge-failed"><span class="dot"></span>FAILED</span>
+      <span class="badge badge-sent"><span class="dot"></span>SENT</span>
+      <span class="badge badge-pending"><span class="dot"></span>PENDING</span>
+      <span class="badge badge-processing"><span class="dot"></span>PROCESSING</span>
+    </div>
+
+    <div class="cover-grid">
+      <a class="screen-link" href="login.html">
+        <div class="screen-thumb">Sign in</div>
+        <div class="screen-meta"><div class="t">Login</div><div class="d">Google OAuth · /oauth/google/login</div></div>
+      </a>
+      <a class="screen-link" href="dashboard.html">
+        <div class="screen-thumb">Campaign list</div>
+        <div class="screen-meta"><div class="t">Dashboard</div><div class="d">List campaigns · GET /campaigns</div></div>
+      </a>
+      <a class="screen-link" href="create-campaign.html">
+        <div class="screen-thumb">New campaign</div>
+        <div class="screen-meta"><div class="t">Create campaign</div><div class="d">POST /campaigns · AI follow-ups</div></div>
+      </a>
+      <a class="screen-link" href="campaign-detail.html">
+        <div class="screen-thumb">Thread timeline</div>
+        <div class="screen-meta"><div class="t">Campaign detail</div><div class="d">GET /campaigns/{id} · pause / resume</div></div>
+      </a>
+      <a class="screen-link" href="dashboard-empty.html">
+        <div class="screen-thumb">Empty state</div>
+        <div class="screen-meta"><div class="t">Dashboard — empty</div><div class="d">First-run / no campaigns</div></div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
