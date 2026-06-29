@@ -20,7 +20,6 @@ export interface Campaign {
 }
 
 export interface CreateCampaignRequest {
-  userId: string;
   recipientEmail: string;
   subject: string;
   initialBody: string;

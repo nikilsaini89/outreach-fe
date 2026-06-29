@@ -43,7 +43,6 @@ export function CreateCampaignPage() {
     setError(null);
     try {
       const campaign = await api.createCampaign({
-        userId,
         recipientEmail,
         subject,
         initialBody,
