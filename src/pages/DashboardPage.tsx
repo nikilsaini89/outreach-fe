@@ -29,7 +29,7 @@ export function DashboardPage() {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    api.listCampaigns(userId)
+    api.listCampaigns()
       .then(setCampaigns)
       .catch(e => setError((e as Error).message))
       .finally(() => setLoading(false));
@@ -105,7 +105,7 @@ export function DashboardPage() {
                 <input
                   className="input"
                   style={{ height: 32, width: 220 }}
-                  placeholder="Search recipient or subject…"
+                  placeholder="Search recipient or subject"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />

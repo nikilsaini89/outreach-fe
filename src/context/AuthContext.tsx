@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextValue {
   userId: string | null;
@@ -9,24 +9,42 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function consumeOAuthParams(): { userId: string | null; email: string | null } {
+function decodeJwtClaims(token: string): Record<string, unknown> {
+  const payload = token.split('.')[1];
+  return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+}
+
+function consumeOAuthParams(): string | null {
   const params = new URLSearchParams(window.location.search);
-  const userId = params.get('userId');
-  const email = params.get('email');
-  if (userId) {
-    localStorage.setItem('ce_userId', userId);
-    if (email) localStorage.setItem('ce_email', email);
+  const authToken = params.get('authToken');
+  const refreshToken = params.get('refreshToken');
+  if (authToken) {
+    localStorage.setItem('ce_authToken', authToken);
+    if (refreshToken) localStorage.setItem('ce_refreshToken', refreshToken);
     window.history.replaceState({}, '', window.location.pathname);
+    return authToken;
   }
-  return { userId, email };
+  return null;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [userId, setUserId] = useState<string | null>(() => {
-    const { userId: fromUrl } = consumeOAuthParams();
-    return fromUrl ?? localStorage.getItem('ce_userId');
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    return consumeOAuthParams() ?? localStorage.getItem('ce_authToken');
   });
-  const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem('ce_email'));
+
+  const claims = authToken ? decodeJwtClaims(authToken) : null;
+  const userId = claims ? (claims['sub'] as string) : null;
+  const userEmail = claims ? (claims['email'] as string) : null;
+
+  useEffect(() => {
+    const onExpired = () => {
+      localStorage.removeItem('ce_authToken');
+      localStorage.removeItem('ce_refreshToken');
+      setAuthToken(null);
+    };
+    window.addEventListener('auth:expired', onExpired);
+    return () => window.removeEventListener('auth:expired', onExpired);
+  }, []);
 
   async function login() {
     const res = await fetch('/oauth/google/login');
@@ -35,10 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   function logout() {
-    localStorage.removeItem('ce_userId');
-    localStorage.removeItem('ce_email');
-    setUserId(null);
-    setUserEmail(null);
+    localStorage.removeItem('ce_authToken');
+    localStorage.removeItem('ce_refreshToken');
+    setAuthToken(null);
   }
 
   return (
