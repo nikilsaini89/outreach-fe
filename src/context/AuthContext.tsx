@@ -47,7 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login() {
-    const res = await fetch('/oauth/google/login');
+    const base = import.meta.env.VITE_API_BASE_URL ?? '';
+    const res = await fetch(`${base}/oauth/google/login`);
     const authUrl: string = await res.json();
     window.location.href = authUrl;
   }
