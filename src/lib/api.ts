@@ -22,6 +22,16 @@ async function refreshAuthToken(): Promise<string | null> {
   return data.authToken;
 }
 
+async function extractErrorMessage(res: Response): Promise<string> {
+  const text = await res.text().catch(() => '');
+  try {
+    const json = JSON.parse(text);
+    return json.message || json.error || text || `HTTP ${res.status}`;
+  } catch {
+    return text || `HTTP ${res.status}`;
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = localStorage.getItem('ce_authToken');
   const headers: Record<string, string> = {
@@ -40,15 +50,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       headers: { ...headers, Authorization: `Bearer ${newToken}` },
     });
     if (!retryRes.ok) {
-      const text = await retryRes.text().catch(() => '');
-      throw new Error(text || `HTTP ${retryRes.status}`);
+      throw new Error(await extractErrorMessage(retryRes));
     }
     return retryRes.json() as Promise<T>;
   }
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(text || `HTTP ${res.status}`);
+    throw new Error(await extractErrorMessage(res));
   }
 
   return res.json() as Promise<T>;
@@ -61,4 +69,5 @@ export const api = {
     request<Campaign>('/campaigns', { method: 'POST', body: JSON.stringify(data) }),
   pauseCampaign: (id: string) => request<Campaign>(`/campaigns/${id}/pause`, { method: 'POST' }),
   resumeCampaign: (id: string) => request<Campaign>(`/campaigns/${id}/resume`, { method: 'POST' }),
+  cancelFollowups: (id: string) => request<Campaign>(`/campaigns/${id}/cancel`, { method: 'POST' }),
 };
