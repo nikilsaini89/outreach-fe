@@ -1,5 +1,5 @@
-export type CampaignStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'FAILED';
-export type FollowupStatus = 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED';
+export type CampaignStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+export type FollowupStatus = 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED' | 'CANCELLED';
 
 export interface Followup {
   id: string;

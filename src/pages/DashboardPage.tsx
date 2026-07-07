@@ -7,7 +7,7 @@ import { campaignBadge } from '../components/ui/Badge';
 import { Spinner } from '../components/ui/Spinner';
 
 function fmtDate(iso: string) {
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
+return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
 }
 
 function IcoPlus() {
@@ -31,7 +31,7 @@ export function DashboardPage() {
     setLoading(true);
     api.listCampaigns()
       .then(setCampaigns)
-      .catch(e => setError((e as Error).message))
+      .catch(() => setError('Failed to load campaigns. Please refresh the page.'))
       .finally(() => setLoading(false));
   }, [userId]);
 
@@ -48,11 +48,6 @@ export function DashboardPage() {
     <>
       <header className="topbar">
         <div className="crumbs"><span className="here">Campaigns</span></div>
-        <div className="topbar-actions">
-          <Link to="/campaigns/new" className="btn btn-secondary btn-sm">
-            <IcoPlus /> New campaign
-          </Link>
-        </div>
       </header>
 
       <div className="content">
@@ -122,7 +117,13 @@ export function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(c => {
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: 'var(--s-10)', color: 'var(--text-muted)' }}>
+                      No campaigns match "{search}"
+                    </td>
+                  </tr>
+                ) : filtered.map(c => {
                   const followups = c.followups ?? [];
                   const sentCount = followups.filter(f => f.status === 'SENT').length;
                   return (

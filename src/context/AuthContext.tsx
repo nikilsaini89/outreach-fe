@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 interface AuthContextValue {
   userId: string | null;
   userEmail: string | null;
+  userName: string | null;
   login: () => Promise<void>;
   logout: () => void;
 }
@@ -35,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const claims = authToken ? decodeJwtClaims(authToken) : null;
   const userId = claims ? (claims['sub'] as string) : null;
   const userEmail = claims ? (claims['email'] as string) : null;
+  const userName = claims ? (claims['name'] as string) ?? null : null;
 
   useEffect(() => {
     const onExpired = () => {
@@ -60,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ userId, userEmail, login, logout }}>
+    <AuthContext.Provider value={{ userId, userEmail, userName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

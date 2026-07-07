@@ -22,6 +22,7 @@ interface InitialItem {
   kind: 'initial';
   sentAt: string;
   body: string;
+  status: 'SENT' | 'FAILED';
 }
 
 interface FollowupItem {
@@ -40,7 +41,7 @@ function InitialCard({ item }: { item: InitialItem }) {
     <div className="tl-card">
       <div className="top">
         <span className="seq">Initial email</span>
-        {followupBadge('SENT')}
+        {followupBadge(item.status)}
       </div>
       <div className="when" style={{ marginBottom: 'var(--s-2)' }}>{fmtDateTime(item.sentAt)}</div>
       <div className="body">{item.body}</div>
@@ -76,7 +77,9 @@ export function Timeline({ entries }: TimelineProps) {
           return (
             <div key={`initial-${i}`} className="tl-item">
               <div className="tl-rail">
-                <div className="tl-node sent">✓</div>
+                <div className={entry.status === 'FAILED' ? 'tl-node failed' : 'tl-node sent'}>
+                  {entry.status === 'FAILED' ? '✗' : '✓'}
+                </div>
               </div>
               <InitialCard item={entry} />
             </div>

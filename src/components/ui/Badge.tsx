@@ -3,7 +3,7 @@ import type { CampaignStatus, FollowupStatus } from '../../types/api';
 type BadgeVariant = Lowercase<CampaignStatus | FollowupStatus>;
 
 const LABELS: Record<string, string> = {
-  active: 'Active', paused: 'Paused', completed: 'Completed', failed: 'Failed',
+  active: 'Active', paused: 'Paused', completed: 'Completed', failed: 'Failed', cancelled: 'Cancelled',
   pending: 'Pending', processing: 'Processing', sent: 'Sent',
 };
 
