@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { AiTag } from '../components/ui/AiTag';
+import { MAX_FOLLOWUP_COUNT, MIN_FOLLOWUP_COUNT } from '../lib/constants';
 
 const HOURS = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
@@ -26,6 +28,7 @@ const IcoSend = () => (
 export function CreateCampaignPage() {
   const { userId } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [recipientEmail, setRecipientEmail] = useState('');
   const [subject, setSubject] = useState('');
@@ -34,13 +37,11 @@ export function CreateCampaignPage() {
   const [gapDays, setGapDays] = useState(3);
   const [preferredHour, setPreferredHour] = useState(10);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!userId) return;
     setSubmitting(true);
-    setError(null);
     try {
       const campaign = await api.createCampaign({
         recipientEmail,
@@ -50,9 +51,15 @@ export function CreateCampaignPage() {
         gapDays,
         preferredHour,
       });
+      if (campaign.status === 'FAILED') {
+        toast('Initial email could not be sent. Campaign saved as failed — no follow-ups scheduled.', 'error');
+      } else {
+        toast('Campaign created! Your first email has been sent.', 'success');
+      }
       navigate(`/campaigns/${campaign.id}`);
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to create the campaign. Please try again.';
+      toast(msg, 'error');
       setSubmitting(false);
     }
   }
@@ -90,8 +97,6 @@ export function CreateCampaignPage() {
             <p className="page-sub">Write the first email. We generate and schedule the follow-ups automatically.</p>
           </div>
         </div>
-
-        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--s-5)' }}>{error}</div>}
 
         <form id="create-form" onSubmit={handleSubmit}>
           <div className="create-grid">
@@ -143,9 +148,9 @@ export function CreateCampaignPage() {
                   <div className="field" style={{ marginBottom: 0 }}>
                     <label className="label">Number of follow-ups</label>
                     <div className="stepper">
-                      <button type="button" onClick={() => setNumberOfFollowUps(n => Math.max(1, n - 1))}>−</button>
+                      <button type="button" onClick={() => setNumberOfFollowUps(n => Math.max(MIN_FOLLOWUP_COUNT, n - 1))}>−</button>
                       <div className="val">{numberOfFollowUps}</div>
-                      <button type="button" onClick={() => setNumberOfFollowUps(n => Math.min(10, n + 1))}>+</button>
+                      <button type="button" onClick={() => setNumberOfFollowUps(n => Math.min(MAX_FOLLOWUP_COUNT, n + 1))}>+</button>
                     </div>
                   </div>
                   <div className="field" style={{ marginBottom: 0 }}>
@@ -187,7 +192,7 @@ export function CreateCampaignPage() {
                   <div className="alert alert-info" style={{ marginBottom: 'var(--s-5)' }}>
                     Initial email sends immediately on create.
                   </div>
-                  <div className="timeline">
+                  <div className="timeline" style={{ maxHeight: 340, overflowY: 'auto', paddingRight: 'var(--s-1)' }}>
                     <div className="tl-item">
                       <div className="tl-rail"><div className="tl-node">0</div></div>
                       <div className="tl-card">
