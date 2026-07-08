@@ -4,7 +4,7 @@ type BadgeVariant = Lowercase<CampaignStatus | FollowupStatus>;
 
 const LABELS: Record<string, string> = {
   active: 'Active', paused: 'Paused', completed: 'Completed', failed: 'Failed', cancelled: 'Cancelled',
-  pending: 'Pending', processing: 'Processing', sent: 'Sent',
+  generating: 'Generating', pending: 'Pending', processing: 'Processing', sent: 'Sent',
 };
 
 export function Badge({ variant }: { variant: BadgeVariant }) {
