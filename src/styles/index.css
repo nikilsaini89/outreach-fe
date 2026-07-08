@@ -22,7 +22,7 @@
   --accent-700: #4242a8;
 
   --green-50:  #e9f6ee; --green-500: #2f9461; --green-700: #1f6b46;
-  --amber-50:  #fbf2e2; --amber-500: #b5821f; --amber-700: #8a6315;
+  --amber-50:  #fbf2e2; --amber-300: #e6c97a; --amber-400: #cc9e3a; --amber-500: #b5821f; --amber-600: #9e7119; --amber-700: #8a6315;
   --red-50:    #fbecec; --red-500:   #c0453c; --red-700:   #97352e;
   --blue-50:   #e8f1fd; --blue-500:  #2f6fd1; --blue-700:  #23529c;
 
@@ -443,4 +443,47 @@ tbody tr:hover { background: var(--gray-25); cursor: pointer; }
 }
 .error-fallback-actions {
   display: flex; gap: var(--s-3); justify-content: center;
+}
+
+/* Generating / async AI states */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.badge-generating { background: var(--amber-50); color: var(--amber-700); animation: pulse-glow 1.4s ease-in-out infinite; }
+.badge-generating .dot { background: var(--amber-500); }
+
+.tl-node.generating {
+  background: var(--amber-50); border-color: var(--amber-400); color: var(--amber-700);
+  border-style: dashed; animation: pulse-glow 1.4s ease-in-out infinite;
+}
+
+.tl-card-generating {
+  border-style: dashed; border-color: var(--amber-300);
+  background: var(--amber-50);
+}
+
+.generating-placeholder {
+  color: var(--amber-600); font-style: italic;
+  animation: pulse-glow 1.4s ease-in-out infinite;
+}
+
+.generating-banner {
+  display: flex; align-items: center; gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.generating-spinner {
+  width: 14px; height: 14px; flex-shrink: 0;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: spin 0.75s linear infinite;
+}
+
+.generating-count {
+  font-size: var(--text-sm); color: var(--amber-600);
+  font-weight: 500; animation: pulse-glow 1.4s ease-in-out infinite;
 }
