@@ -10,6 +10,7 @@ function nodeClass(status: FollowupStatus) {
   if (status === 'SENT') return 'tl-node sent';
   if (status === 'PROCESSING') return 'tl-node processing';
   if (status === 'FAILED') return 'tl-node failed';
+  if (status === 'GENERATING') return 'tl-node generating';
   return 'tl-node';
 }
 
@@ -50,6 +51,21 @@ function InitialCard({ item }: { item: InitialItem }) {
 }
 
 function FollowupCard({ followup }: { followup: Followup }) {
+  if (followup.status === 'GENERATING') {
+    return (
+      <div className="tl-card tl-card-generating">
+        <div className="top">
+          <span className="seq">Follow-up {followup.sequenceNumber} <AiTag /></span>
+          {followupBadge(followup.status)}
+        </div>
+        <div className="when" style={{ marginBottom: 'var(--s-2)' }}>
+          Scheduled {fmtDateTime(followup.scheduledAt)}
+        </div>
+        <div className="body generating-placeholder">AI is writing this follow-up…</div>
+      </div>
+    );
+  }
+
   const when = followup.status === 'SENT'
     ? fmtDateTime(followup.scheduledAt)
     : `Scheduled ${fmtDateTime(followup.scheduledAt)}`;

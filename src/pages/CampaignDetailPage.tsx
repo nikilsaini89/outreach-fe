@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import type { Campaign } from '../types/api';
@@ -64,6 +64,34 @@ export function CampaignDetailPage() {
       .catch(() => setError('Campaign not found. It may have been removed or you may not have access.'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const isGenerating = (campaign?.followups ?? []).some(f => f.status === 'GENERATING');
+  const wasGeneratingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isGenerating || !id) return;
+    const interval = setInterval(async () => {
+      try {
+        const updated = await api.getCampaign(id);
+        setCampaign(updated);
+        const stillGenerating = updated.followups.some(f => f.status === 'GENERATING');
+        if (!stillGenerating) {
+          clearInterval(interval);
+          const anyFailed = updated.followups.some(f => f.status === 'FAILED');
+          toast(
+            anyFailed
+              ? 'Follow-up generation failed — campaign marked as failed.'
+              : 'Your AI follow-ups are ready!',
+            anyFailed ? 'error' : 'success'
+          );
+        }
+      } catch {
+        // swallow polling errors
+      }
+    }, 3000);
+    wasGeneratingRef.current = true;
+    return () => clearInterval(interval);
+  }, [isGenerating, id, toast]);
 
   async function handlePause() {
     if (!campaign) return;
@@ -163,6 +191,7 @@ export function CampaignDetailPage() {
   const followups = campaign.followups ?? [];
   const sent = followups.filter(f => f.status === 'SENT').length;
   const pending = followups.filter(f => f.status === 'PENDING').length;
+  const generating = followups.filter(f => f.status === 'GENERATING').length;
   const failed = followups.filter(f => f.status === 'FAILED').length;
   const nextPending = followups.find(f => f.status === 'PENDING');
 
@@ -227,13 +256,20 @@ export function CampaignDetailPage() {
           </div>
           <div className="stat">
             <div className="k">Pending</div>
-            <div className="v">{pending}</div>
+            <div className="v">{generating > 0 ? <span className="generating-count">{generating} generating</span> : pending}</div>
           </div>
           <div className="stat">
             <div className="k">Failed</div>
             <div className="v">{failed}</div>
           </div>
         </div>
+
+        {isGenerating && (
+          <div className="alert alert-info generating-banner">
+            <span className="generating-spinner" />
+            AI is writing your follow-ups — this usually takes a few seconds
+          </div>
+        )}
 
         <div className="detail-grid">
           <div className="card">
